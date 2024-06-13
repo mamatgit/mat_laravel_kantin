@@ -7,9 +7,8 @@ use Illuminate\Http\Request;
 
 class BarangController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    //halamanutama
     public function index(Request $request)
     {
         if ($request->has('search')) {
@@ -21,12 +20,22 @@ class BarangController extends Controller
         return view('index', compact('data'));
     }
 
-    public function read()
+
+    public function read(Request $request)
     {
-        $data=Barang::all();
-        return view('read',compact('data'));
+        $this->middleware('admin')->only('read');
+
+        if ($request->has('search')) {
+            $data = Barang::where('nama', 'LIKE', '%'. $request->search. '%')->paginate(5)->appends(['search' => $request->search]);
+        } else {
+            $data = Barang::paginate(5);
+        }
+
+        return view('read', ['data' => $data]);
     }
 
+
+    //editdata
     public function tampilkandata($id)
     {
         $data=Barang::find($id);
@@ -39,6 +48,7 @@ class BarangController extends Controller
         return redirect()->route('read')->with('success','Data Berhasil Di Update');
     }
 
+    //hapusdata
     public function delete($id){
         $data=Barang::find($id);
         $data->delete();
@@ -46,6 +56,7 @@ class BarangController extends Controller
 
     }
 
+    //tambahdata
     public function tambahdata(Request $request)
     {
         return view('tambahdata');
@@ -53,6 +64,15 @@ class BarangController extends Controller
 
     public function insertdata(Request $request)
     {
+        $this->validate($request,[
+            'nama' => 'required|string|max:255',
+            'harga' => 'required|string|max:255',
+            'jumlah' => 'required|string|max:255',
+            'foto' => 'required',
+            'deskripsi' => 'required|string|max:255',
+
+        ]);
+
         $data = Barang::create($request->all());
 
         if ($request->hasFile('foto')) {
@@ -64,6 +84,19 @@ class BarangController extends Controller
         return redirect()->route('read')->with('success','Data Berhasil Di Tambahkan');
     }
 
+
+
+    //fiturlainnya
+
+    public function gallery(Request $request){
+        if ($request->has('search')) {
+            $data = Barang::where('nama', 'LIKE', '%' . $request->search . '%')->get();
+        } else {
+            $data = Barang::all();
+        }
+
+        return view('gallery', compact('data'));
+    }
     public function about()
     {
         return view('about');

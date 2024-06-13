@@ -19,33 +19,49 @@
 
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">ID</label>
-                                <input type="text" name="id" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="text" name="id" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Nama Barang</label>
-                                <input type="text" name="nama" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="text" name="nama" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+                                @error('nama')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Harga Barang</label>
-                                <input type="number" name="harga" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="number" name="harga" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+                                @error('harga')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Jumlah Barang</label>
-                                <input type="number" name="jumlah" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="number" name="jumlah" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+                                @error('jumlah')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Deskripsi Barang</label>
-                                <input type="text" name="deskripsi" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="text" name="deskripsi" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+                                @error('deskripsi')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Foto</label>
-                                <input type="file" name="foto" class="form-control">
+                                <input type="file" name="foto" class="form-control" required>
+                                @error('foto')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
                             </div>
+
 
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </form>
