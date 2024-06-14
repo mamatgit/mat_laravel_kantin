@@ -87,6 +87,12 @@ public function add(Request $request)
     return view('product', compact('product'));
 }
 
+public function cart() {
+    $carts = Cart::with('barang')->where('user_id', auth()->id())->get();
+    return view('keranjang', compact('carts'));
+}
+
+
 //checkout
 public function checkout(Request $request)
 {
