@@ -125,15 +125,22 @@
     </style>
 </head>
 <body>
+    @if (Session::has('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ Session::get('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
     <div class="content-wrapper">
         <header class="navbar navbar-expand-lg navbar-light bg-body-tertiary sticky-top" data-bs-theme="dark">
             <div class="container-fluid py-3">
-                <a class="navbar-brand mb-0 h1" href="index" style="color: rgb(5, 198, 247); font-size: 2rem;">Wikrama Canteen</a>
+                <a class="navbar-brand mb-0 h1" href="{{ route('index') }}" style="color: rgb(5, 198, 247); font-size: 2rem;">Wikrama Canteen</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarScroll">
-                    <form class="d-flex search-form" role="search" action="/index" method="GET">
+                    <form class="d-flex search-form" role="search" action="{{ route('index') }}" method="GET">
                         <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
@@ -169,49 +176,33 @@
                         @endauth
 
                         <li class="nav-item">
-                            <a class="nav-link active" href="index" style="font-size: 20px;">Home</a>
+                            <a class="nav-link active" href="{{ route('index') }}" style="font-size: 20px;">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="gallery" style="font-size: 20px;">Gallery</a>
+                            <a class="nav-link active" href="{{ route('gallery') }}" style="font-size: 20px;">Gallery</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" style="font-size: 20px;" aria-current="page" href="/about">About</a>
+                            <a class="nav-link active" style="font-size: 20px;" aria-current="page" href="{{ route('about') }}">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" style="font-size: 20px;" aria-current="page" href="/contact">Contact</a>
+                            <a class="nav-link active" style="font-size: 20px;" aria-current="page" href="{{ route('contact') }}">Contact</a>
                         </li>
                     </ul>
                 </div>
             </div>
         </header>
 
-        @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
-@if(session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-@endif
-
-
         <main class="container">
             <h1 class="text-center">Keranjang Belanja</h1>
 
             @if($carts->isEmpty())
             <p class="text-center">Keranjang belanja Anda kosong.</p>
-            <p class="text-center"><a href="index">Ayo Belanja Dulu YUK!!!</a><i class="fa-solid fa-cart-shopping"></i></p>
+            <p class="text-center"><a href="{{ route('index') }}">Ayo Belanja Dulu YUK!!!</a><i class="fa-solid fa-cart-shopping"></i></p>
             @else
             <table class="table">
-                {{-- <thead>
+                <thead>
                     <tr>
-                        <th scope="col">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="selectAllCheckbox">Select All
-                            </div>
-                        </th>
+                        <th scope="col"><input type="checkbox" id="select-all"></th>
                         <th scope="col">Foto</th>
                         <th scope="col">Nama Produk</th>
                         <th scope="col">Harga</th>
@@ -219,69 +210,51 @@
                         <th scope="col">Total Harga</th>
                         <th scope="col">Aksi</th>
                     </tr>
-                </thead> --}}
-
+                </thead>
                 <tbody>
-                    <form action="{{ route('checkout') }}" method="post">
-                        @csrf
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col"><input type="checkbox" id="select-all"></th>
-                                    <th scope="col">Foto</th>
-                                    <th scope="col">Nama Produk</th>
-                                    <th scope="col">Harga</th>
-                                    <th scope="col">Kuantitas</th>
-                                    <th scope="col">Total Harga</th>
-                                    <th scope="col">Aksi</th>
-                                </tr>
-                            </thead>
-                        </tbody>
-
-                                @foreach($carts as $cart)
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" name="selected_items[]" value="{{ $cart->id }}" class="select-item">
-                                    </td>
-                                    <td><img src="{{ asset('fotodata/' . $cart->barang->foto) }}" style="width: 50px;height:auto;" alt="Foto {{ $cart->barang->nama }}"></td>
-                                    <td>{{ $cart->barang->nama }}</td>
-                                    <td>Rp. {{ number_format($cart->barang->harga, 0, ',', '.') }}</td>
-                                    <td>
-                                        <form action="{{ route('cart.update', $cart) }}" method="post">
-                                            @csrf
-                                            <input type="number" name="quantity" value="{{ $cart->quantity }}" min="1" class="form-control" style="width: 80px;">
-                                            <button class="btn btn-primary">Update</button>
-                                        </form>
-                                    </td>
-                                    <td>Rp. {{ number_format($cart->totalharga, 0, ',', '.') }}</td>
-                                    <td>
-                                        <form action="{{ route('cart.destroy', $cart) }}" method="post">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="7">
-                                        <button type="submit" class="btn btn-success">Checkout Selected Items</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </form>
-
+                    @foreach($carts as $cart)
+                    <tr>
+                        <td><input type="checkbox" name="selected_items[]" value="{{ $cart->id }}" class="select-item"></td>
+                        <td><img src="{{ asset('fotodata/' . $cart->barang->foto) }}" style="width: 50px;height:auto;" alt="Foto {{ $cart->barang->nama }}"></td>
+                        <td>{{ $cart->barang->nama }}</td>
+                        <td>Rp. {{ number_format($cart->barang->harga, 0, ',', '.') }}</td>
+                        <td>
+                            <form action="{{ route('cart.update', $cart->id) }}" method="post">
+                                @csrf
+                                @method('PATCH')
+                                <input type="number" name="quantity" value="{{ $cart->quantity }}" min="1" class="form-control" style="width: 80px;">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </td>
+                        <td>Rp. {{ number_format($cart->totalharga, 0, ',', '.') }}</td>
+                        <td>
+                            <form action="{{ route('cart.destroy', $cart->id) }}" method="post">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="7">
+                            <form action="{{ route('checkout') }}" method="post">
+                                @csrf
+                                <input type="hidden" name="selected_items" id="selected_items">
+                                <button type="submit" class="btn btn-success">Checkout Selected Items</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
             @endif
         </main>
 
         <footer>
             <div class="container">
-                <p>&copy; <a href="about">Canteen Wikrama 2024</a></p>
+                <p>&copy; <a href="{{ route('about') }}">Canteen Wikrama 2024</a></p>
             </div>
         </footer>
     </div>
@@ -293,16 +266,15 @@
                 checkbox.checked = this.checked;
             }
         });
-    </script>
 
-    {{-- <script>
-        document.getElementById('selectAllCheckbox').addEventListener('change', function() {
-            var checkboxes = document.querySelectorAll('.form-check-input');
-            for (var checkbox of checkboxes) {
-                checkbox.checked = this.checked;
-            }
-        });
-    </script> --}}
+            document.querySelector('form[action="{{ route('checkout') }}"]').addEventListener('submit', function(event) {
+                var selectedItems = [];
+                document.querySelectorAll('.select-item:checked').forEach(function(checkbox) {
+                    selectedItems.push(checkbox.value);
+                });
+                document.getElementById('selected_items').value = selectedItems.join(',');
+            });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-qU4dggEc01jrzkAP8/cLjs+bgUhbttCl3YH48LgRyF6x5Iw1jLoCEJ/IXcTZAK2h" crossorigin="anonymous"></script>

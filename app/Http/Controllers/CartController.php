@@ -18,58 +18,65 @@ class CartController extends Controller
     {
         $user = Auth::user();
         $carts = Cart::with('barang')->where('user_id', $user->id)->get();
-        return view('cart', compact('carts'));
+        return view('user/cart', compact('carts'));
     }
 
-   // Tambahkan produk ke keranjang
-public function add(Request $request)
-{
-    $request->validate([
-        'id' => 'required|exists:barangs,id',
-        'quantity' => 'required|integer|min:1',
-    ]);
-
-    $user = Auth::user();
-    $barang = Barang::findOrFail($request->id);
-
-    // Cek apakah produk sudah ada di keranjang
-    $existingCart = Cart::where('user_id', $user->id)
-                        ->where('barang_id', $request->id)
-                        ->first();
-
-    if ($existingCart) {
-        // Update jumlah dan harga total jika produk sudah ada
-        $existingCart->quantity += $request->quantity;
-        $existingCart->totalharga = $existingCart->quantity * $barang->harga;
-        $existingCart->save();
-    } else {
-        // Tambahkan produk baru ke keranjang
-        Cart::create([
-            'user_id' => $user->id,
-            'barang_id' => $request->id,
-            'quantity' => $request->quantity,
-            'totalharga' => $request->quantity * $barang->harga,
-        ]);
-    };
-
-    return redirect()->route('cart.index')
-                     ->with('success', 'Produk berhasil ditambahkan ke keranjang.');
-}
-
-// Perbarui jumlah produk di keranjang
-    public function update(Request $request, Cart $cart)
+    // Tambahkan produk ke keranjang
+    public function add(Request $request)
     {
         $request->validate([
+            'id' => 'required|exists:barangs,id',
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $cart->update([
-            'quantity' => $request->quantity,
-            'totalharga' => $cart->quantity * $cart->barang->harga,
-        ]);
+        $user = Auth::user();
+        $barang = Barang::findOrFail($request->id);
+
+        // Cek apakah produk sudah ada di keranjang
+        $existingCart = Cart::where('user_id', $user->id)
+            ->where('barang_id', $request->id)
+            ->first();
+
+        if ($existingCart) {
+            // Update jumlah dan harga total jika produk sudah ada
+            $existingCart->quantity += $request->quantity;
+            $existingCart->totalharga = $existingCart->quantity * $barang->harga;
+            $existingCart->save();
+        } else {
+            // Tambahkan produk baru ke keranjang
+            Cart::create([
+                'user_id' => $user->id,
+                'barang_id' => $request->id,
+                'quantity' => $request->quantity,
+                'totalharga' => $request->quantity * $barang->harga,
+            ]);
+        };
 
         return redirect()->route('cart.index')
-        ->with('success', 'Keranjang berhasil diperbarui.');
+            ->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+    }
+
+    //update produk
+    public function update(Request $request, Cart $cart)
+    {
+        // Ensure that the cart item belongs to the current user
+        if ($cart->user_id !== Auth::id()) {
+            return redirect()->route('cart.index')->with('error', 'Unauthorized action.');
+        }
+
+        // Validate the input
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        // Calculate the new total price based on the updated quantity
+        $cart->quantity = $request->input('quantity');
+        $cart->totalharga = $cart->quantity * $cart->barang->harga;
+
+        // Save the updated cart item
+        $cart->save();
+
+        return redirect()->route('cart.index')->with('success', 'Item quantity updated.');
     }
 
     // Hapus produk dari keranjang
@@ -77,92 +84,26 @@ public function add(Request $request)
     {
         $cart->delete();
         return redirect()->route('cart.index')
-        ->with('success', 'Produk berhasil dihapus dari keranjang.');
+            ->with('success', 'Produk berhasil dihapus dari keranjang.');
     }
 
-//produk tampil
-    public function show($id)
-{
-    $product = Barang::findOrFail($id);
-    return view('product', compact('product'));
-}
+    public function checkout(Request $request)
+    {
+        // Ambil data yang dibutuhkan dari request
+        $selectedItems = $request->input('selected_items');
 
-public function cart() {
-    $carts = Cart::with('barang')->where('user_id', auth()->id())->get();
-    return view('keranjang', compact('carts'));
-}
+        // Proses untuk menghapus produk yang dipilih dari keranjang belanja
+        $selectedItemsArray = explode(',', $selectedItems);
 
-
-//checkout
-public function checkout(Request $request)
-{
-    // Validasi barang yang dipilih
-    $selectedItems = $request->input('selected_items');
-    if (empty($selectedItems)) {
-        return redirect()->route('cart.index')->with('error', 'Tidak ada barang yang dipilih untuk checkout.');
-    }
-
-    DB::beginTransaction();
-    try {
-        $totalPrice = 0;
-        $orderItems = [];
-
-        foreach ($selectedItems as $cartId) {
-            $cart = Cart::find($cartId);
-
-            if (!$cart) {
-                return redirect()->route('cart.index')->with('error', 'Barang dalam keranjang tidak ditemukan.');
+        foreach ($selectedItemsArray as $itemId) {
+            // Hapus item dari keranjang belanja berdasarkan ID
+            $item = Cart::find($itemId);
+            if ($item) {
+                $item->delete();
             }
-
-            $product = $cart->barang; // Asumsi relasi ke model barang
-            if ($product->stock < $cart->quantity) {
-                return redirect()->route('cart.index')->with('error', "Stok untuk barang {$product->nama} tidak mencukupi.");
-            }
-
-            // Mengurangi stok barang
-            $product->stock -= $cart->quantity;
-            $product->save();
-
-            // Hitung total harga
-            $totalPrice += $cart->quantity * $product->harga;
-
-            // Persiapkan data item pesanan
-            $orderItems[] = [
-                'product_id' => $product->id,
-                'quantity' => $cart->quantity,
-                'price' => $product->harga,
-                'total_price' => $cart->quantity * $product->harga,
-            ];
-
-            // Hapus item dari keranjang
-            $cart->delete();
         }
 
-        // Simpan data pesanan
-        $order = new Order();
-        $order->user_id = auth()->user()->id;
-        $order->total_price = $totalPrice;
-        $order->status = 'Pending'; // Sesuaikan dengan logika status yang Anda gunakan
-        $order->save();
-
-        // Simpan item pesanan
-        foreach ($orderItems as $item) {
-            $orderItem = new OrderItem();
-            $orderItem->order_id = $order->id;
-            $orderItem->product_id = $item['product_id'];
-            $orderItem->quantity = $item['quantity'];
-            $orderItem->price = $item['price'];
-            $orderItem->total_price = $item['total_price'];
-            $orderItem->save();
-        }
-
-        DB::commit();
-
-        return redirect()->route('order.confirmation')->with('success', 'Checkout berhasil!');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->route('cart.index')->with('error', 'Terjadi kesalahan saat memproses checkout: ' . $e->getMessage());
+        // Kembalikan respon yang sesuai, misalnya, redirect kembali ke halaman keranjang belanja
+        return redirect()->route('cart.index')->with('success', 'Items checked out successfully!');
     }
-}
 }

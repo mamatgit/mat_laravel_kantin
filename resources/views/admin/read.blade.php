@@ -6,6 +6,7 @@
   <title>Canteen Wikrama</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     .navbar-brand {
       font-size: 1.5rem;
@@ -36,7 +37,7 @@
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-dark bg-dark fixed-top">
+<nav class="navbar navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Dashboard Admin</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
@@ -50,13 +51,13 @@
         <div class="offcanvas-body">
           <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/read">Home(Read)</a>
+              <a class="nav-link active" aria-current="page" href="/read"><i class="fa-solid fa-shop"></i> Admin Product</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/cartadmin">Carts</a>
+              <a class="nav-link active" aria-current="page" href="/cartadmin"><i class="fa-solid fa-cart-shopping"></i> Admin Carts</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/usersadmin">Users</a>
+              <a class="nav-link active" aria-current="page" href="/usersadmin"><i class="fa-regular fa-user"></i> Admin Users</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -84,6 +85,7 @@
     </div>
   </nav>
 
+
   <div class="container mt-5">
     <h1 class="text-center mb-5 ">Data Barang</h1>
     <a href="/tambahdata" type="button" class="btn btn-success mb-3">Tambah Data</a>
@@ -92,11 +94,7 @@
       <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
 
-    @if ($message = Session::get('success'))
-      <div class="alert alert-success" role="alert">
-        {{ $message }}
-      </div>
-    @endif
+
 
     <div class="table-responsive">
       <table class="table table-bordered table-striped">
@@ -136,12 +134,19 @@
       {{ $data->links() }}
     </div>
   </div>
+  {{-- @if (Session::has('success'))
+    <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+        {{ Session::get('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  @endif --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLeSaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         $(".delete").click(function(){
@@ -183,6 +188,12 @@
                 }
             });
         });
+    </script>
+    <script>
+        @if (Session::has('success'))
+        toastr.success("{{ Session::get('success') }}")
+        @endif
+
     </script>
 </body>
 </html>

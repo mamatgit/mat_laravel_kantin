@@ -177,7 +177,7 @@
                     <div class="form-group">
                         <label for="password" class="font-weight-bold">Password</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" placeholder="password must be at least 8 characters" name="password" required>
                             <div class="input-group-append">
                                 <span class="input-group-text">
                                     <i class="fas fa-eye-slash" id="togglePassword" style="cursor: pointer;"></i>
@@ -185,7 +185,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    <button type="submit" class="btn btn-primary btn-block">Login   <i class="fa-solid fa-right-to-bracket"></i></button>
                 </form>
             </div>
             <div class="text-center mt-3">

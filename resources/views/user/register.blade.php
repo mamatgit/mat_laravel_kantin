@@ -191,7 +191,7 @@
                     <div class="form-group">
                         <label for="password" class="font-weight-bold">Password</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" placeholder="password must be at least 8 characters" name="password"  required>
                             <div class="input-group-append">
                                 <span class="input-group-text">
                                     <i class="fas fa-eye-slash" id="togglePassword" style="cursor: pointer;"></i>
@@ -203,10 +203,10 @@
                         <label for="password_confirmation" class="font-weight-bold">Confirm Password</label>
                         <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                    <button type="submit" class="btn btn-primary btn-block">Register    <i class="fa-solid fa-right-to-bracket"></i></button>
                 </form>
             </div>
-            <div class="text-center mt-3">
+            <div class="text-center mb-5">
                 <a href="{{ route('login') }}" class="text-decoration-none">Already have an account? Login here</a>
             </div>
         </div>

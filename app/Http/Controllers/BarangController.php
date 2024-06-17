@@ -17,7 +17,7 @@ class BarangController extends Controller
             $data = Barang::all();
         }
 
-        return view('index', compact('data'));
+        return view('user/index', compact('data'));
     }
 
 
@@ -26,45 +26,46 @@ class BarangController extends Controller
         $this->middleware('admin')->only('read');
 
         if ($request->has('search')) {
-            $data = Barang::where('nama', 'LIKE', '%'. $request->search. '%')->paginate(5)->appends(['search' => $request->search]);
+            $data = Barang::where('nama', 'LIKE', '%' . $request->search . '%')->paginate(5)->appends(['search' => $request->search]);
         } else {
             $data = Barang::paginate(5);
         }
 
-        return view('read', ['data' => $data]);
+        return view('admin/read', ['data' => $data]);
     }
 
 
     //editdata
     public function tampilkandata($id)
     {
-        $data=Barang::find($id);
+        $data = Barang::find($id);
         return view('tampilkandata', compact('data'));
     }
 
-    public function updatedata(request $request, $id){
-        $data=Barang::find($id);
+    public function updatedata(request $request, $id)
+    {
+        $data = Barang::find($id);
         $data->update($request->all());
-        return redirect()->route('read')->with('success','Data Berhasil Di Update');
+        return redirect()->route('read')->with('success', 'Data Berhasil Di Update');
     }
 
     //hapusdata
-    public function delete($id){
-        $data=Barang::find($id);
+    public function delete($id)
+    {
+        $data = Barang::find($id);
         $data->delete();
-        return redirect()->route('read')->with('success','Data Berhasil Di Delete');
-
+        return redirect()->route('read')->with('success', 'Data Berhasil Di Delete');
     }
 
     //tambahdata
     public function tambahdata(Request $request)
     {
-        return view('tambahdata');
+        return view('admin/tambahdata');
     }
 
     public function insertdata(Request $request)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'nama' => 'required|string|max:255',
             'harga' => 'required|string|max:255',
             'jumlah' => 'required|string|max:255',
@@ -81,30 +82,36 @@ class BarangController extends Controller
             $data->save();
         }
 
-        return redirect()->route('read')->with('success','Data Berhasil Di Tambahkan');
+        return redirect()->route('read')->with('success', 'Data Berhasil Di Tambahkan');
     }
 
 
 
     //fiturlainnya
 
-    public function gallery(Request $request){
+    public function gallery(Request $request)
+    {
         if ($request->has('search')) {
             $data = Barang::where('nama', 'LIKE', '%' . $request->search . '%')->get();
         } else {
             $data = Barang::all();
         }
 
-        return view('gallery', compact('data'));
+        return view('user/gallery', compact('data'));
+    }
+
+    public function show($id)
+    {
+        $product = Barang::findOrFail($id);
+        return view('user/product', compact('product'));
     }
     public function about()
     {
-        return view('about');
+        return view('user/about');
     }
 
     public function contact()
     {
-        return view('contact');
+        return view('user/contact');
     }
-
 }

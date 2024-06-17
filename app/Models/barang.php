@@ -23,9 +23,5 @@ class Barang extends Model
         return $this->hasMany(Cart::class, 'barang_id');
     }
 
-    public function orderItems()
-{
-    return $this->hasMany(OrderItem::class);
-}
 
 }
